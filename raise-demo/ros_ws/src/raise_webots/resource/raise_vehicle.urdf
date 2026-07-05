@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<robot name="RAISE Vehicle">
+    <webots>
+        <plugin type="raise_webots.vehicle_driver.VehicleDriver" />
+        <plugin type="webots_ros2_driver::Ros2IMU">
+            <enabled>true</enabled>
+            <alwaysOn>true</alwaysOn>
+            <updateRate>20</updateRate>
+            <topicName>/vehicle/imu</topicName>
+            <frameName>imu_link</frameName>
+            <inertialUnitName>inertial_unit</inertialUnitName>
+            <gyroName>gyro</gyroName>
+            <accelerometerName>accelerometer</accelerometerName>
+        </plugin>
+        <device reference="gps" type="GPS">
+            <ros>
+                <enabled>true</enabled>
+                <alwaysOn>true</alwaysOn>
+                <updateRate>10</updateRate>
+                <topicName>/vehicle/gps</topicName>
+            </ros>
+        </device>
+    </webots>
+</robot>

@@ -1,0 +1,11 @@
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+ros_ws/.build_done
+ros_ws/build/
+ros_ws/install/
+ros_ws/log/
+# vendored source build of the Webots ROS 2 driver (no Lyrical binary yet)
+ros_ws/src/webots_ros2/

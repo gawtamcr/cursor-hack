@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Build output
+.next/
+dist/
+build/
+.turbo/
+.vite/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Logs / OS
+*.log
+.DS_Store

@@ -1,0 +1,54 @@
+# Phase 0b — RAISE demo with the real Webots plant, headless, on ROS 2 Jazzy.
+#
+# Extends the Phase 0a idea (Jazzy, apt deps, no vendored webots_ros2) by adding
+# the webots_ros2 driver + Webots itself and building raise_webots too. Webots
+# runs headless (--no-rendering --batch --minimize); the world downloads its
+# R2025a EXTERNPROTO assets from GitHub on first launch, so the container needs
+# network on that first run.
+#
+# Kept separate from ./Dockerfile so the proven, fast core-only image remains
+# the fallback if headless Webots won't boot in this container.
+FROM osrf/ros:jazzy-desktop
+
+SHELL ["/bin/bash", "-c"]
+ENV DEBIAN_FRONTEND=noninteractive
+
+# webots_ros2_driver expects Webots R2025a (matches the world's EXTERNPROTO
+# pins). We PRE-INSTALL Webots R2025a from the official .deb rather than let
+# webots_ros2 auto-install at launch — the auto-installer prompts on stdin and
+# aborts the launch (EOFError) in a non-interactive container.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      ros-jazzy-ackermann-msgs \
+      ros-jazzy-webots-ros2-driver \
+      python3-opencv \
+      python3-colcon-common-extensions \
+      xvfb wget ca-certificates \
+    && wget -q -O /tmp/webots.deb \
+        https://github.com/cyberbotics/webots/releases/download/R2025a/webots_2025a_amd64.deb \
+    && apt-get install -y --no-install-recommends /tmp/webots.deb \
+    && rm -f /tmp/webots.deb \
+    && rm -rf /var/lib/apt/lists/*
+
+# Webots is installed to /usr/local/webots by the .deb. Run headless/offscreen.
+ENV QT_QPA_PLATFORM=offscreen
+ENV WEBOTS_HOME=/usr/local/webots
+
+WORKDIR /ws
+
+COPY ros_ws/src/raise_interfaces ./src/raise_interfaces
+COPY ros_ws/src/raise_core       ./src/raise_core
+COPY ros_ws/src/raise_webots     ./src/raise_webots
+
+RUN source /opt/ros/jazzy/setup.bash \
+    && colcon build --symlink-install \
+         --packages-select raise_interfaces raise_core raise_webots
+
+RUN echo 'source /opt/ros/jazzy/setup.bash' >> /root/.bashrc \
+    && echo 'source /ws/install/setup.bash' >> /root/.bashrc
+
+COPY docker/entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Headless full demo: Webots city + vehicle driver + core graph.
+CMD ["ros2", "launch", "raise_webots", "demo.launch.py"]

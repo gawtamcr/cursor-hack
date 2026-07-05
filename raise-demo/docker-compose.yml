@@ -1,0 +1,31 @@
+# Phase 0a container for the RAISE demo ROS-only graph.
+#
+# Port 8000 is published now (the future agent_backend / MCP HTTP shim boundary,
+# added in Phase 0c) so the host-side stdio MCP server can reach the container
+# over localhost:8000 without any docker exec.
+services:
+  # Default runnable stack: real core graph (fault injector + monitor + lane
+  # follower) + the synthetic plant standing in for Webots. Uses the fast,
+  # proven core-only image; the plant script is mounted in (kept out of
+  # ros_ws/src/**, so the sim packages are never modified).
+  raise-sim:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: raise-demo:jazzy
+    container_name: raise-sim
+    ports:
+      - "8000:8000"
+    # ROS 2 default (DDS) middleware; keep discovery inside the container.
+    environment:
+      - ROS_DOMAIN_ID=0
+    volumes:
+      - ./docker/synthetic_plant.py:/plant/synthetic_plant.py:ro
+      - ./docker/run_synthetic.sh:/plant/run_synthetic.sh:ro
+      - ./docker/mcp_http.py:/plant/mcp_http.py:ro
+      - ./docker/plm_diagnosis.py:/plant/plm_diagnosis.py:ro
+      # Reused verbatim from the existing (untouched) agent_backend package.
+      - ./agent_backend/tools.py:/plant/tools.py:ro
+    command: ["bash", "/plant/run_synthetic.sh"]
+    # Keep stdout unbuffered so launch logs stream to `docker compose logs`.
+    tty: true

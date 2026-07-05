@@ -1,0 +1,4 @@
+string fault_type
+---
+bool ok
+string message

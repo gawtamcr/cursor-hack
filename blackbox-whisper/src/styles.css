@@ -1,0 +1,123 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Design system definition — light-only, Apple × Tesla direction.
+ *
+ * The @theme inline block maps CSS custom properties to Tailwind utility
+ * classes (e.g. --color-primary -> bg-primary, text-primary).
+ *
+ * The :root block defines the actual color values. All colors MUST use
+ * oklch format (hex equivalents noted in comments).
+ *
+ * Language rules:
+ * - Monochrome neutrals + ONE accent (--primary, Apple blue) for CTAs and
+ *   live/active states. --accent stays a neutral gray hover surface.
+ * - anomaly/success are desaturated system colors, used only on badges,
+ *   icons, strokes and inline text — never card borders or large fills.
+ * - Elevation comes from --shadow-* tokens, not card borders; hairline
+ *   --border is reserved for internal dividers and frosted chrome.
+ *
+ * To add a new semantic color:
+ * 1. Add the variable to :root
+ * 2. Register it in @theme inline as --color-<name>: var(--<name>)
+ */
+
+@theme inline {
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+  --shadow-hairline: 0 0 0 1px oklch(0 0 0 / 5%);
+  --shadow-card: 0 1px 1px oklch(0 0 0 / 3%), 0 8px 24px -12px oklch(0 0 0 / 12%);
+  --shadow-float: 0 2px 8px oklch(0 0 0 / 6%), 0 12px 32px -8px oklch(0 0 0 / 16%);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-replay: var(--replay);
+  --color-replay-soft: var(--replay-soft);
+  --color-anomaly: var(--anomaly);
+  --color-anomaly-soft: var(--anomaly-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-surface-muted: var(--surface-muted);
+  --color-ring-offset-background: var(--background);
+}
+
+:root {
+  --radius: 1rem;
+
+  /* Neutrals — Apple light */
+  --background: oklch(0.971 0.002 286); /* ~#f5f5f7 */
+  --foreground: oklch(0.243 0.004 286); /* ~#1d1d1f */
+  --card: oklch(1 0 0); /* #ffffff */
+  --card-foreground: oklch(0.243 0.004 286);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.243 0.004 286);
+  --secondary: oklch(0.955 0.002 286); /* ~#f0f0f2, quiet fills */
+  --secondary-foreground: oklch(0.243 0.004 286);
+  --muted: oklch(0.978 0.001 286);
+  --muted-foreground: oklch(0.552 0.009 286); /* ~#6e6e73 */
+  --accent: oklch(0.955 0.002 286); /* neutral hover surface — never blue */
+  --accent-foreground: oklch(0.243 0.004 286);
+  --border: oklch(0 0 0 / 8%); /* hairline */
+  --input: oklch(0 0 0 / 10%);
+  --ring: oklch(0.558 0.19 253.6 / 45%);
+  --surface-muted: oklch(0.982 0.001 286); /* between card and background */
+
+  /* The ONE accent — Apple blue ~#0071e3 */
+  --primary: oklch(0.558 0.19 253.6);
+  --primary-foreground: oklch(1 0 0);
+
+  /* Domain semantics — desaturated Apple system colors */
+  --replay: oklch(0.558 0.19 253.6); /* planned path = the accent */
+  --replay-soft: oklch(0.965 0.014 253.6); /* ~#eef4fd */
+  --anomaly: oklch(0.58 0.15 25); /* desaturated Apple red ~#cf4f42 */
+  --anomaly-soft: oklch(0.972 0.011 25); /* ~#fbf1ef */
+  --success: oklch(0.6 0.12 152); /* muted green ~#3d9463 */
+  --success-soft: oklch(0.972 0.016 152); /* ~#eef8f1 */
+  --warning: oklch(0.62 0.13 70); /* desaturated amber ~#b0782d */
+  --warning-soft: oklch(0.977 0.018 85); /* ~#fdf6e9 */
+  --destructive: oklch(0.58 0.15 25);
+  --destructive-foreground: oklch(1 0 0);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+}
